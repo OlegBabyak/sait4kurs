@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Партія Зе!Гачі!</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="shortcut icon" href="gachi.png" type="image/x-icon">
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<style>
+		/* Add some basic styles to make the slider visible */
+		#slides {
+			overflow: hidden;
+			width: 100%;
+		}
+
+		.image {
+			display: flex;
+			transition: margin-left 0.5s ease-in-out;
+		}
+
+		.image article {
+			width: 100%;
+		}
+
+		input[name="slider"]:checked+#controls label {
+			background-color: #3498db;
+		}
+
+		input[name="slider"]:checked+#active label {
+			background-color: #3498db;
+		}
+
+		input[name="slider"] {
+			display: none;
+		}
+
+		#controls label {
+			cursor: pointer;
+			display: inline-block;
+			margin: 0 5px;
+			width: 15px;
+			height: 15px;
+			background-color: #ddd;
+			border-radius: 50%;
+		}
+
+		#controls label.highlight,
+		#active label.highlight {
+			background-color: #3498db;
+		}
+
+		.clock-container {
+			color: #3374a0;
+			font-size: 18px;
+			margin-left: auto;
+		}
+
+		.image article img {
+			width: 550px;
+			height: 450px;
+			object-fit: cover;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 3;
+			padding-top: 50px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0, 0, 0, 0.9);
+		}
+
+		.modal-content {
+			margin: auto;
+			display: block;
+			width: 80%;
+			max-width: 700px;
+			margin-top: 70px;
+			/* Adjust this value based on your header's height */
+		}
+
+		.close {
+			position: absolute;
+			top: 15px;
+			right: 35px;
+			color: #f1f1f1;
+			font-size: 30px;
+			font-weight: bold;
+			transition: 0.3s;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #bbb;
+			text-decoration: none;
+			cursor: pointer;
+		}
+	</style>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+
+<body>
+	<a href="#top" title="Повернутись на початок сторінки" class="topNubex"></a>
+	<header class="header">
+		<div class="cont">
+			<a name="top"></a>
+			<div class="header_inner">
+				<div class="header_logo"><b>GaChi</b></div>
+				<div class="clock-container"></div>
+
+				<nav class="nav">
+					<a class="nav_link" href="#inf"><b>Про партію</b></a>
+					<a class="nav_link" href="#nov"><b>Новини</b></a>
+					<a class="nav_link" href="#dud"><b>Учасники</b></a>
+				</nav>
+			</div>
+		</div>
+	</header>
+	<div class="bas">
+		<article id="slider">
+			<div id="slides">
+				<div id="overflow" class="image">
+					<article><img src="1.jpg"></article>
+					<article><img src="2.jpg"></article>
+					<article><img src="3.jpg"></article>
+					<article><img src="4.jpg"></article>
+					<article><img src="5.jpg"></article>
+				</div>
+			</div>
+			<div id="controls"></div>
+			<div id="active"></div>
+		</article>
+	</div>
+
+	<script>
+		$(document).ready(function () {
+			$("#datepicker").datepicker();
+			// Create controls and active elements dynamically
+			for (let i = 1; i <= 5; i++) {
+				$('#controls').append(`<input type="radio" name="slider" id="switch${i}">`);
+				$('#active').append(`<label for="switch${i}"></label>`);
+			}
+
+			// Handle radio button change event
+			$('input[name="slider"]').change(function () {
+				let index = $('input[name="slider"]:checked').index() + 1;
+
+				// Remove the highlight class from all labels
+				$('#controls label').removeClass('highlight');
+				$('#active label').removeClass('highlight');
+
+				// Add the highlight class to the selected labels
+				$(`#controls label:eq(${index - 1})`).addClass('highlight');
+				$(`#active label:eq(${index - 1})`).addClass('highlight');
+
+				$('#slides .image').css('margin-left', `-${(index - 1) * 100}%`);
+			});
+
+			function updateClock() {
+				const now = new Date();
+				const hours = now.getHours();
+				const minutes = now.getMinutes();
+				const seconds = now.getSeconds();
+
+				const formattedTime = `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+				$('.clock-container').text(formattedTime);
+			}
+
+			// Initial call to set the clock when the page loads
+			updateClock();
+
+			// Set interval to update the clock every second (1000 milliseconds)
+			setInterval(updateClock, 1000);
+
+			$('.image article').on('click', 'img', function () {
+				var imageUrl = $(this).attr('src');
+				openPhoto(imageUrl);
+			});
+
+			// Updated openPhoto function
+			function openPhoto(url) {
+				var modal = $("#myModal");
+				var modalImg = $("#modalImg");
+
+				// Check if the modal is already open
+				if (modal.css("display") === "block") {
+					// If it's open, close the modal
+					modal.hide();
+				} else {
+					// If it's not open, open the modal with the clicked image
+					modal.show();
+					modalImg.attr("src", url);
+				}
+			}
+
+			// Add closePhoto function to close the modal
+			function closePhoto() {
+				$("#myModal").hide();
+			}
+
+			// Attach the closePhoto function to the close button
+			$(".close").on("click", closePhoto);
+
+		});
+	</script>
+
+	<div id="myModal" class="modal">
+		<span class="close" onclick="closePhoto()">&times;</span>
+		<img class="modal-content" id="modalImg">
+	</div>
+
+	<div class="part_inf">
+		<input type="text" id="datepicker" placeholder="Select a date">
+		<hr class="hr">
+		<hr class="hr">
+		<font size="10" color="blue" face="Arial"><a name="inf"></a><b>
+				<p>Політична партія «Зе!Гачі!»</p>
+			</b></font>
+		<p class="p">
+			<font size="5" color="blue" face="Arial"><b>Ми кинули виклик системі! Ми шукаємо якісно нових людей, які
+					готові змінювати, які не були частиною старої політики, які мають здобутки у своїй справі!
+					Перше завдання – очищення країни від корупції.</b>
+		</p>
+		</font>
+		<hr class="hr">
+		<hr class="hr">
+		<p>
+			<font size="7" color="blue" face="Arial"><b>Ідеологія Партії»</b></font>
+		</p>
+		<p class="p">
+			<font size="4" color="blue" face="Arial"><b>Український центризм – політична ідеологія в Україні, яка
+					передбачає пошук компромісу між різними групами населення,
+					уникнення розколу країни за політичними, етнічними та мовними ознаками, відмову від лівого та
+					правого екстремізму та концентрацію на ключових напрямках розвитку:
+					мир, інститути, інвестиції, інфраструктура та народовладдя.</b>
+		</p>
+		</font>
+		<hr class="hr">
+		<hr class="hr">
+		<p class="p">
+			<font size="4" color="blue" face="Arial"><b>
+					<p class="p">Ми – за ринкову економіку та економічну свободу для бізнесу. І водночас – за активну
+						роль держави у обмеженні монополій та забезпеченні соціальної справедливості для кожного
+						українця.</p>
+					<hr class="hr">
+					<p class="p">Ми – за місцеве самоврядування і децентралізацію, за міцні громади, які самостійно
+						вирішують більшість питань місцевого розвитку. І водночас – за спроможну державу, здатну
+						відстоювати суверенітет і територіальну цілісність, забезпечувати громадянський мир і порядок,
+						встановлювати і забезпечувати додержання правил гри. Ми вибудовуємо партнерські та конструктивні
+						відносини між центральною і місцевою владами. Місцеве самоврядування для нас – фундамент
+						державності.</p>
+					<hr class="hr">
+					<p class="p">Ми – за справжню демократію та політичний діалог, вільні та відповідальні медіа,
+						розмаїття думок і позицій. І водночас – проти корупції та брехні, які прикриваються і маскуються
+						політичною риторикою, провокуючи конфлікти та розкол всередині країни.</p>
+					<hr class="hr">
+					<p class="p">Ми – за припинення війни і повернення миру. Але лише на умовах збереження незалежності
+						і суверенітету України, повернення наших територій і наших людей.</p>
+					<hr class="hr">
+					<p class="p">Ми – за реальне народовладдя, яке надасть людям можливість впливати на рішення влади не
+						раз на п’ять років, а щодня. І водночас – ми за зважені та системні рішення, які відповідають
+						реальним можливостям економіки та бюджету, за викорінення популізму та політичних маніпуляцій,
+						за якими завжди стоять приватні чи групові інтереси.</p>
+					<hr class="hr">
+					<p class="p">Ми – за оновлення політичної еліти країни. Ми підтримуємо нові обличчя. Але наш
+						пріоритет – нові підходи у політиці, державному управлінні, місцевому самоврядуванні: чесна
+						політика і чесна влада, яка дбає про інтереси людини, громади, держави.</p>
+					<hr class="hr">
+					<p class="p">Ми – за рух до Європи, який є беззастережним цивілізаційним вибором України. І водночас
+						ми наголошуємо: кожен крок на цьому шляху повинен сприяти розвитку України, зміцненню економіки
+						і підвищенню добробуту громадян.</p>
+					<hr class="hr">
+					<p class="p">Ми ставимося із повагою до історичного і культурного надбання українського народу,
+						спрямовуємо зусилля на збереження нашої спадщини. І водночас наголошуємо: патріотизм для нас
+						означає – створювати краще майбутнє разом.</p>
+				</b></font>
+			<hr class="hr">
+
+	</div>
+	<div class="part_inf">
+		<hr class="hr">
+		<font size="10" color="blue" face="Arial"><a name="nov"></a><b>
+				<p>Новини</p>
+			</b></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Влада захищає свої прибутки в офшорах,
+						тим часом збільшуючи податки для звичайних українців. Максим Нефьодов // 11.10.2021</p>
+					</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Підготувати плацдарм протидії COVID-19 на осінь вже не встигли,
+						треба врахувати це принаймні у бюджеті-2022. // Інна Совсун // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">ТСК по «вагнерівцях» заплуталася у своїх версіях.
+						// Сергій Рахманін // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Влада захищає свої прибутки в офшорах,
+						тим часом збільшуючи податки для звичайних українців. Максим Нефьодов // 11.10.2021</p>
+					</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Підготувати плацдарм протидії COVID-19 на осінь вже не встигли,
+						треба врахувати це принаймні у бюджеті-2022. // Інна Совсун // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">ТСК по «вагнерівцях» заплуталася у своїх версіях.
+						// Сергій Рахманін // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Влада захищає свої прибутки в офшорах,
+						тим часом збільшуючи податки для звичайних українців. Максим Нефьодов // 11.10.2021</p>
+					</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Підготувати плацдарм протидії COVID-19 на осінь вже не встигли,
+						треба врахувати це принаймні у бюджеті-2022. // Інна Совсун // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">ТСК по «вагнерівцях» заплуталася у своїх версіях.
+						// Сергій Рахманін // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Влада захищає свої прибутки в офшорах,
+						тим часом збільшуючи податки для звичайних українців. Максим Нефьодов // 11.10.2021</p>
+					</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">Підготувати плацдарм протидії COVID-19 на осінь вже не встигли,
+						треба врахувати це принаймні у бюджеті-2022. // Інна Совсун // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+		<font size="5" color="blue" face="Arial"><a href="now.html"><b>
+					<p class="nav_link">ТСК по «вагнерівцях» заплуталася у своїх версіях.
+						// Сергій Рахманін // 11.10.2021</p>
+				</b></a></font>
+		<hr class="hr">
+	</div>
+	<div class="part_diach">
+		<font size="10" color="blue" face="Arial"><a name="dud"></a><b>
+				<p>Партійні діячі</p>
+			</b></font>
+	</div>
+	<table class="table" width="75%" height="300px">
+		<tr class="tr">
+			<th class="th">
+				<font size="9" color="blue" face="Arial">Фото</font>
+			</th>
+			<th class="th">
+				<font size="10" color="blue" face="Arial">Ім'я партійного діяча</font>
+			</th>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud1.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Абдуллін Олександр Рафкатович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud2.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Абрамович Ігор Олександрович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud3_2.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Аксьонов Андрій Анатолійович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud4.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Алєксєєв Сергій Олегович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud1.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Абдуллін Олександр Рафкатович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud2.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Абрамович Ігор Олександрович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud3_2.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Аксьонов Андрій Анатолійович</b></font>
+			</td>
+		</tr>
+		<tr class="tr">
+			<td class="photo"><img src="dud4.jpg" alt="Помянем"></td>
+			<td class="td">
+				<font size="8" color="blue" face="Arial"><a name="nov"></a><b>Алєксєєв Сергій Олегович</b></font>
+			</td>
+		</tr>
+
+	</table>
+	<footer class="footer">
+		<div class="c_footer">
+			<font size="5" color="burlywood" face="Arial"><b>
+					<pre>&copy; 2021            Телефон: +380950202676;            Пошта: oleh2003KNinf@gmail.com;</pre>
+				</b></font>
+		</div>
+	</footer>
+</body>
+
+</html>
